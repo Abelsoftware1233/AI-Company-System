@@ -1,1 +1,64 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <title>Business Manager Pro</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; background: #f4f4f4; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        input { display: block; margin: 10px 0; padding: 10px; width: 100%; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bedrijfsbeheer Systeem</h1>
+        
+        <h3>Nieuwe Klant Toevoegen</h3>
+        <input type="text" id="naam" placeholder="Bedrijfsnaam">
+        <input type="text" id="btw" placeholder="BTW-nummer (bijv. NL123456789B01)">
+        <input type="text" id="adres" placeholder="Adres">
+        <button onclick="voegKlantToe()">Klant Opslaan</button>
+
+        <hr>
+
+        <h3>Klantenoverzicht</h3>
+        <table id="klantenTabel">
+            <thead>
+                <tr><th>Naam</th><th>BTW-nummer</th><th>Adres</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        async function laadKlanten() {
+            const res = await fetch('/api/klanten');
+            const klanten = await res.json();
+            const tbody = document.querySelector('#klantenTabel tbody');
+            tbody.innerHTML = klanten.map(k => `
+                <tr><td>${k.naam}</td><td>${k.btwNummer}</td><td>${k.adres}</td></tr>
+            `).join('');
+        }
+
+        async function voegKlantToe() {
+            const klant = {
+                naam: document.getElementById('naam').value,
+                btwNummer: document.getElementById('btw').value,
+                adres: document.getElementById('adres').value
+            };
+            await fetch('/api/klanten', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(klant)
+            });
+            laadKlanten(); // Refresh de lijst
+        }
+
+        laadKlanten();
+    </script>
+</body>
+</html>
 
