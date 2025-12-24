@@ -25,3 +25,16 @@ Typ: npm start.
 Je server draait nu!
 Hoe test je dit?
 Je kunt nu geen website zien (want we hebben nog geen HTML/Frontend), maar je kunt de data testen met een programmaatje zoals Postman of via je browser op http://localhost:3000/klanten.
+
+Open je terminal in de projectmap.
+Run: npm install
+Run: npm start
+Ga naar http://localhost:3000.
+Je GitHub Repository aanmaken:
+Ga naar GitHub en maak een nieuwe repo.
+In je terminal:
+git init
+git add .
+git commit -m "Eerste release van ERP systeem"
+git remote add origin [JOUW_GITHUB_LINK]
+git push -u origin main
