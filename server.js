@@ -1,48 +1,36 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const db = require('./database');
+const cors = require('cors');
+const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 
 const app = express();
-app.use(bodyParser.json());
+const DB_FILE = './data.json';
 
-// 1. Haal alle klanten op
-app.get('/klanten', (req, res) => {
-    const data = db.read();
-    res.json(data.klanten);
+app.use(cors());
+app.use(bodyParser.json());
+app.use(express.static('public')); // Hiermee tonen we de frontend
+
+// Database initialisatie
+if (!fs.existsSync(DB_FILE)) {
+    fs.writeFileSync(DB_FILE, JSON.stringify({ klanten: [], opdrachten: [] }));
+}
+
+const readDB = () => JSON.parse(fs.readFileSync(DB_FILE));
+const writeDB = (data) => fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+
+// API Routes
+app.get('/api/klanten', (req, res) => {
+    res.json(readDB().klanten);
 });
 
-// 2. Voeg een nieuwe klant toe (met BTW nummer)
-app.post('/klanten', (req, res) => {
-    const data = db.read();
-    const nieuweKlant = {
-        id: uuidv4(),
-        naam: req.body.naam,
-        btwNummer: req.body.btwNummer,
-        adres: req.body.adres
-    };
-    
+app.post('/api/klanten', (req, res) => {
+    const data = readDB();
+    const nieuweKlant = { id: uuidv4(), ...req.body };
     data.klanten.push(nieuweKlant);
-    db.write(data);
+    writeDB(data);
     res.status(201).json(nieuweKlant);
 });
 
-// 3. Maak een opdracht aan voor een klant
-app.post('/opdrachten', (req, res) => {
-    const data = db.read();
-    const nieuweOpdracht = {
-        opdrachtNummer: `ORD-${Date.now()}`,
-        klantId: req.body.klantId,
-        omschrijving: req.body.omschrijving,
-        bedrag: req.body.bedrag
-    };
-
-    data.opdrachten.push(nieuweOpdracht);
-    db.write(data);
-    res.status(201).json(nieuweOpdracht);
-});
-
 const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Systeem draait op http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server draait op http://localhost:${PORT}`));
