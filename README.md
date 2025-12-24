@@ -17,6 +17,9 @@ Een basis B2B systeem voor het beheren van klantgegevens en opdrachten.
 - REST API interface.
 
 
+Run dit commando in je terminal:
+npm install bcryptjs express-session
+
 Hoe krijg je dit aan de praat?
 Installeer Node.js op je computer (als je dat nog niet hebt).
 Open je terminal (CMD of PowerShell) in de map van je project.
@@ -38,3 +41,5 @@ git add .
 git commit -m "Eerste release van ERP systeem"
 git remote add origin [JOUW_GITHUB_LINK]
 git push -u origin main
+
+
