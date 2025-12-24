@@ -1,94 +1,55 @@
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Business ERP Pro</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        input, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { background: #28a745; color: white; border: none; padding: 12px; width: 100%; cursor: pointer; border-radius: 5px; font-weight: bold; }
-        button:hover { background: #218838; }
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background: #007bff; color: white; }
-    </style>
-</head>
 <body>
-
-    <div class="card">
-        <h1>Bedrijfs Dashboard</h1>
-        <h3>Klant Toevoegen</h3>
-        <input type="text" id="naam" placeholder="Bedrijfsnaam">
-        <input type="text" id="btw" placeholder="BTW-Nummer">
-        <input type="text" id="adres" placeholder="Adres">
-        <button onclick="voegKlantToe()">Klant Opslaan</button>
+    <div id="authSection" class="card">
+        <h1>Inloggen</h1>
+        <input type="email" id="loginEmail" placeholder="E-mail">
+        <input type="password" id="loginPass" placeholder="Wachtwoord">
+        <button onclick="login()">Log In</button>
+        <hr>
+        <p>Nog geen account? <button style="background:gray" onclick="register()">Registreer</button></p>
     </div>
 
-    <div class="card">
-        <h3>Snel Factureren</h3>
-        <select id="klantSelect"></select>
-        <input type="text" id="omschrijving" placeholder="Omschrijving werkzaamheden">
-        <input type="number" id="bedrag" placeholder="Bedrag excl. BTW">
-        <button style="background: #007bff;" onclick="maakFactuur()">Genereer PDF Factuur</button>
-    </div>
-
-    <div class="card">
-        <h3>Geregistreerde Klanten</h3>
-        <table id="klantenTabel">
-            <thead><tr><th>Naam</th><th>BTW</th><th>Adres</th></tr></thead>
-            <tbody></tbody>
-        </table>
-    </div>
+    <div id="mainDashboard" style="display:none;">
+        <div class="card">
+            <button onclick="logout()" style="background:red; width: 100px; float: right;">Uitloggen</button>
+            <h1>Bedrijfs Dashboard</h1>
+            <h3>Klant Toevoegen</h3>
+            <input type="text" id="naam" placeholder="Bedrijfsnaam">
+            <input type="text" id="btw" placeholder="BTW-Nummer">
+            <input type="text" id="adres" placeholder="Adres">
+            <button onclick="voegKlantToe()">Klant Opslaan</button>
+        </div>
+        </div>
 
     <script>
-        async function laadData() {
-            const res = await fetch('/api/klanten');
-            const klanten = await res.json();
-            
-            // Tabel vullen
-            document.querySelector('#klantenTabel tbody').innerHTML = klanten.map(k => 
-                `<tr><td>${k.naam}</td><td>${k.btwNummer}</td><td>${k.adres}</td></tr>`
-            ).join('');
-
-            // Dropdown vullen
-            document.getElementById('klantSelect').innerHTML = klanten.map(k => 
-                `<option value="${k.id}">${k.naam}</option>`
-            ).join('');
-        }
-
-        async function voegKlantToe() {
-            const klant = {
-                naam: document.getElementById('naam').value,
-                btwNummer: document.getElementById('btw').value,
-                adres: document.getElementById('adres').value
-            };
-            await fetch('/api/klanten', {
+        async function login() {
+            const res = await fetch('/api/login', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(klant)
+                body: JSON.stringify({ email: document.getElementById('loginEmail').value, password: document.getElementById('loginPass').value })
             });
-            alert('Klant opgeslagen!');
-            laadData();
+            if (res.ok) {
+                document.getElementById('authSection').style.display = 'none';
+                document.getElementById('mainDashboard').style.display = 'block';
+                laadData();
+            } else { alert('Fout bij inloggen'); }
         }
 
-        async function maakFactuur() {
-            const data = {
-                klantId: document.getElementById('klantSelect').value,
-                omschrijving: document.getElementById('omschrijving').value,
-                bedrag: document.getElementById('bedrag').value
-            };
-            const res = await fetch('/api/factureer', {
+        async function register() {
+            const email = prompt("E-mail voor nieuw account:");
+            const password = prompt("Wachtwoord:");
+            await fetch('/api/register', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
+                body: JSON.stringify({ email, password })
             });
-            const result = await res.json();
-            alert(result.message + "\nCheck de map 'facturen' op je computer.");
+            alert('Geregistreerd! Je kunt nu inloggen.');
         }
 
-        laadData();
+        async function logout() {
+            await fetch('/api/logout');
+            location.reload();
+        }
+
+        // ... De rest van je bestaande laadData, voegKlantToe en maakFactuur functies ...
     </script>
 </body>
-</html>
