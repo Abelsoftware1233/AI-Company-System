@@ -1,0 +1,4 @@
+node_modules/
+facturen/*.pdf
+data.json
+.DS_Store
