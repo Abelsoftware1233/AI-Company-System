@@ -20,6 +20,12 @@ Een basis B2B systeem voor het beheren van klantgegevens en opdrachten.
 Run dit commando in je terminal:
 npm install bcryptjs express-session
 
+Wat is er nu veranderd in je mappen?
+Beveiliging: Je kunt niet meer direct naar /api/klanten gaan zonder in te loggen.
+Database: In je data.json wordt nu een lijst met gebruikers bijgehouden met versleutelde wachtwoorden.
+Flow: Als je de app opent, zie je eerst het login-scherm.
+Je repository is nu een volwaardige Secure Web App. Vergeet niet de nieuwe wijzigingen te commiten naar GitHub!
+
 Hoe krijg je dit aan de praat?
 Installeer Node.js op je computer (als je dat nog niet hebt).
 Open je terminal (CMD of PowerShell) in de map van je project.
